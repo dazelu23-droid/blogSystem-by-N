@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World War II — Full Document</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    header a {
+      color: #e94560;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    header a:hover { text-decoration: underline; }
+    .viewer {
+      flex: 1;
+      width: 100%;
+      min-height: calc(100vh - 60px);
+    }
+    iframe, object, embed {
+      width: 100%;
+      height: calc(100vh - 60px);
+      border: none;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>World War II: A Comprehensive History</h1>
+    <a href="ww2-world-war-ii.pdf" download>Download PDF</a>
+  </header>
+  <div class="viewer">
+    <iframe
+      src="ww2-world-war-ii.pdf"
+      title="World War II PDF"
+    ></iframe>
+  </div>
+</body>
+</html>

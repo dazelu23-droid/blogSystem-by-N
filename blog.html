@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibe Blog</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #f8f6f3;
+      color: #2c2c2c;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: #c9c9d4;
+      font-size: 1rem;
+    }
+
+    nav {
+      margin-top: 1.25rem;
+    }
+
+    nav a {
+      color: #e94560;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .intro {
+      margin-bottom: 2.5rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .intro h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+
+    article {
+      margin-bottom: 3rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid #e0ddd8;
+    }
+
+    article:last-of-type {
+      border-bottom: none;
+    }
+
+    article img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+
+    .post-meta {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+
+    article h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #1a1a2e;
+    }
+
+    article h2 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    article h2 a:hover {
+      color: #e94560;
+    }
+
+    article p {
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    .read-more {
+      display: inline-block;
+      color: #e94560;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .read-more:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      background: #1a1a2e;
+      color: #c9c9d4;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    #about {
+      scroll-margin-top: 1rem;
+    }
+
+    #about h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #1a1a2e;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Vibe Blog</h1>
+    <p>Thoughts, stories &amp; ideas — plain HTML, no fuss.</p>
+    <nav>
+      <a href="#posts">Posts</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro" id="about">
+      <h2>Welcome</h2>
+      <p>
+        This is a simple, self-contained blog built with HTML only. No JavaScript,
+        no frameworks — just words, images, and a little inline CSS.
+      </p>
+    </section>
+
+    <section id="posts">
+
+      <article id="post-1">
+        <img
+          src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80"
+          alt="Laptop on a desk with code on the screen"
+        >
+        <p class="post-meta">June 5, 2026 · 3 min read</p>
+        <h2><a href="#post-1">Why Simple Tools Still Matter</a></h2>
+        <p>
+          In a world of complex frameworks and ever-changing stacks, there is something
+          refreshing about opening a single HTML file and having it just work. No build
+          step, no dependencies to update, no surprise breaking changes on a Tuesday morning.
+        </p>
+        <p>
+          Plain HTML forces you to focus on what actually matters: the content. When you
+          strip away the tooling, you remember why you started writing in the first place.
+        </p>
+        <a class="read-more" href="#post-1">Continue reading →</a>
+      </article>
+
+      <article id="post-2">
+        <img
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+          alt="Mountain landscape at sunrise"
+        >
+        <p class="post-meta">May 28, 2026 · 4 min read</p>
+        <h2><a href="#post-2">Finding Focus in a Noisy World</a></h2>
+        <p>
+          Notifications ping. Tabs multiply. The to-do list grows faster than you can check
+          items off. Sound familiar? Focus is not about doing more — it is about doing
+          fewer things with more intention.
+        </p>
+        <p>
+          Start small: one hour without your phone, one task at a time, one page written
+          without switching windows. The clarity that follows is worth every minute of
+          discomfort.
+        </p>
+        <a class="read-more" href="#post-2">Continue reading →</a>
+      </article>
+
+      <article id="post-3">
+        <img
+          src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=800&q=80"
+          alt="Person writing in a notebook at a café"
+        >
+        <p class="post-meta">May 15, 2026 · 2 min read</p>
+        <h2><a href="#post-3">The Joy of Writing by Hand</a></h2>
+        <p>
+          There is a tactile pleasure in putting pen to paper that no keyboard can replicate.
+          The slower pace gives your thoughts room to breathe. Ideas that rush past on a screen
+          tend to linger when you write them out longhand.
+        </p>
+        <p>
+          Try keeping a small notebook nearby. Jot down a sentence when inspiration strikes.
+          You might be surprised how often those scribbles become something worth sharing.
+        </p>
+        <a class="read-more" href="#post-3">Continue reading →</a>
+      </article>
+
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 Vibe Blog. Built with HTML only.</p>
+  </footer>
+
+</body>
+</html>

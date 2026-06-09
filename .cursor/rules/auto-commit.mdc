@@ -1,0 +1,40 @@
+---
+description: Commit code automatically after every change
+alwaysApply: true
+---
+
+# Auto-Commit on Every Change
+
+After completing any code changes in this project, create a git commit before finishing your response.
+
+## When to Commit
+
+- Commit after every task that modifies, adds, or deletes files
+- Do not skip commits for "small" changes — if files changed, commit them
+- Do not commit if there are no changes (no empty commits)
+
+## Commit Workflow
+
+1. Run `git status`, `git diff`, and `git log -1` in parallel to understand the current state
+2. Draft a concise 1–2 sentence commit message focused on **why**, matching the repo's style
+3. Stage relevant files, commit, then run `git status` to verify success
+4. Do **not** push unless the user explicitly asks
+
+## Safety Rules
+
+- Never commit secrets (`.env`, credentials, API keys)
+- Never update git config or run destructive git commands
+- Never skip hooks (`--no-verify`) unless the user explicitly requests it
+- If a pre-commit hook fails, fix the issue and create a **new** commit (do not amend a failed commit)
+
+## Commit Message Format
+
+Use a HEREDOC for the message:
+
+```bash
+git commit -m "$(cat <<'EOF'
+Brief summary of why the change was made.
+
+EOF
+)"
+```
