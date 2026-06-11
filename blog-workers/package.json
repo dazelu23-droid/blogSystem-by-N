@@ -1,0 +1,16 @@
+{
+  "name": "simple-blog-by-n",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "db:init": "wrangler d1 execute simple-blog-db --remote --file=schema.sql -y"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  }
+}

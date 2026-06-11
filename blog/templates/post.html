@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} — Blog{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='post.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<article class="post-detail">
+  <h1>{{ post.title }}</h1>
+  <div class="post-meta">
+    <span class="post-author">{{ post.author }}</span>
+    <time datetime="{{ post.created_at }}">{{ post.created_at }}</time>
+    {% if post.updated_at %}
+      <span class="edited-marker">(edited)</span>
+    {% endif %}
+  </div>
+  <div class="post-body">{{ post.body }}</div>
+
+  {% if current_user == post.author %}
+  <div class="post-actions">
+    <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" class="btn btn-secondary">Edit</a>
+    <form method="post" action="{{ url_for('posts.delete_post_route', post_id=post.id) }}" class="delete-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <section class="reactions" id="reactions" data-post-id="{{ post.id }}" data-csrf="{{ csrf_token }}">
+    <button type="button" class="reaction-btn {% if user_reaction == 'like' %}active{% endif %}" data-kind="like" id="like-btn">
+      👍 <span id="like-count">{{ counts.like }}</span>
+    </button>
+    <button type="button" class="reaction-btn {% if user_reaction == 'dislike' %}active{% endif %}" data-kind="dislike" id="dislike-btn">
+      👎 <span id="dislike-count">{{ counts.dislike }}</span>
+    </button>
+  </section>
+
+  <section class="comments-section">
+    <h2>Comments</h2>
+    <ul id="comment-list" class="comment-list">
+      {% for comment in comments %}
+      <li class="comment" data-comment-id="{{ comment.id }}">
+        <div class="comment-meta">
+          <strong>{{ comment.author }}</strong>
+          <time datetime="{{ comment.created_at }}">{{ comment.created_at }}</time>
+        </div>
+        <p class="comment-body">{{ comment.body }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% if current_user %}
+    <form id="comment-form" class="comment-form" data-post-id="{{ post.id }}" data-csrf="{{ csrf_token }}">
+      <label for="comment-body">Add a comment</label>
+      <textarea id="comment-body" name="body" rows="3" maxlength="2000" required></textarea>
+      <button type="submit" class="btn btn-primary">Post comment</button>
+      <p id="comment-error" class="form-error" hidden></p>
+    </form>
+    {% else %}
+    <p class="comment-login-prompt"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to leave a comment.</p>
+    {% endif %}
+  </section>
+</article>
+{% endblock %}

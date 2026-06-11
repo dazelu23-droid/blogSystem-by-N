@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Home — Blog{% endblock %}
+{% block content %}
+<h1 class="page-title">Latest Posts</h1>
+{% if posts %}
+  <div class="post-list">
+    {% include "_post_list.html" %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No posts yet. Be the first to write something!</p>
+    {% if current_user %}
+      <a href="{{ url_for('posts.new_post') }}" class="btn btn-primary">Write a post</a>
+    {% else %}
+      <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign up to post</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

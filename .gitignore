@@ -1,0 +1,7 @@
+.tools/
+blog/blog.db
+blog/__pycache__/
+blog/**/__pycache__/
+blog/.pytest_cache/
+blog-workers/node_modules/
+blog-workers/.wrangler/

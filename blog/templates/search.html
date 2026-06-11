@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Search — Blog{% endblock %}
+{% block content %}
+<h1 class="page-title">Search</h1>
+<form method="get" action="{{ url_for('search.search') }}" class="search-form">
+  <label for="search-q">Search posts</label>
+  <div class="search-row">
+    <input type="search" id="search-q" name="q" value="{{ query }}" maxlength="100" placeholder="Search by title or body…">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </div>
+</form>
+
+{% if prompt %}
+  <div class="empty-state">
+    <p>Enter a search term to find posts.</p>
+  </div>
+{% elif posts %}
+  <div class="post-list">
+    {% include "_post_list.html" %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No posts match "{{ query }}".</p>
+  </div>
+{% endif %}
+{% endblock %}
