@@ -27,7 +27,37 @@
           <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign up</a>
         {% endif %}
       </nav>
-      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+      <div class="header-controls">
+        <div class="pref-dropdown">
+          <button id="theme-toggle" type="button" class="pref-trigger theme-toggle"
+                  aria-label="Choose theme" aria-haspopup="listbox" aria-expanded="false">
+            🎨 Theme
+          </button>
+          <ul id="theme-menu" class="pref-menu" role="listbox" aria-label="Color themes" hidden>
+            <li role="option" data-theme="light" tabindex="-1">Light</li>
+            <li role="option" data-theme="dark" tabindex="-1">Dark</li>
+            <li role="option" data-theme="ocean" tabindex="-1">Ocean</li>
+            <li role="option" data-theme="forest" tabindex="-1">Forest</li>
+            <li role="option" data-theme="sunset" tabindex="-1">Sunset</li>
+            <li role="option" data-theme="lavender" tabindex="-1">Lavender</li>
+            <li role="option" data-theme="midnight" tabindex="-1">Midnight</li>
+          </ul>
+        </div>
+        <div class="pref-dropdown">
+          <button id="font-toggle" type="button" class="pref-trigger font-toggle"
+                  aria-label="Choose font" aria-haspopup="listbox" aria-expanded="false">
+            Aa Font
+          </button>
+          <ul id="font-menu" class="pref-menu" role="listbox" aria-label="Font styles" hidden>
+            <li role="option" data-font="system" tabindex="-1">System</li>
+            <li role="option" data-font="serif" tabindex="-1">Serif</li>
+            <li role="option" data-font="mono" tabindex="-1">Monospace</li>
+            <li role="option" data-font="rounded" tabindex="-1">Rounded</li>
+            <li role="option" data-font="elegant" tabindex="-1">Elegant</li>
+            <li role="option" data-font="classic" tabindex="-1">Classic</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </header>
 
