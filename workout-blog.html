@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iron &amp; Motion — Workout Blog</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --text: #1a2e22;
+      --text-muted: #5c6f63;
+      --accent: #e76f51;
+      --accent-dark: #c45a3f;
+      --header: #1b4332;
+      --header-muted: #b7d4c4;
+      --border: #d8e4dc;
+      --card-shadow: 0 4px 20px rgba(27, 67, 50, 0.08);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--header) 0%, #2d6a4f 100%);
+      color: #fff;
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: var(--header-muted);
+      font-size: 1.05rem;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    nav {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1.25rem;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      transition: background 0.2s;
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+
+    .intro {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+    }
+
+    .intro h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--header);
+    }
+
+    .intro p {
+      color: #334d3f;
+      margin-bottom: 0.75rem;
+    }
+
+    .intro p:last-child { margin-bottom: 0; }
+
+    article {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 0 0 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    article img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-body {
+      padding: 1.5rem 1.75rem 0;
+    }
+
+    .post-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
+    }
+
+    article h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--header);
+      line-height: 1.3;
+    }
+
+    article h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.6rem;
+      color: #2d6a4f;
+    }
+
+    article p {
+      margin-bottom: 0.9rem;
+      color: #334d3f;
+    }
+
+    article ul, article ol {
+      margin: 0 0 1rem 1.25rem;
+      color: #334d3f;
+    }
+
+    article li {
+      margin-bottom: 0.4rem;
+    }
+
+    .muscle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0 1.25rem;
+    }
+
+    .muscle-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    .muscle-card strong {
+      display: block;
+      color: var(--header);
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+    }
+
+    .muscle-card span {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      background: #e8f5ee;
+      color: #1b4332;
+    }
+
+    .tip-box {
+      background: #fff8f0;
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1.25rem 0;
+      font-size: 0.95rem;
+    }
+
+    .tip-box strong {
+      color: var(--accent-dark);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0 1.25rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--header);
+      font-weight: 600;
+    }
+
+    footer {
+      background: var(--header);
+      color: var(--header-muted);
+      text-align: center;
+      padding: 1.75rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.75rem; }
+      .article-body { padding: 1.25rem 1.25rem 0; }
+      article img { height: 200px; }
+      table { font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Iron &amp; Motion</h1>
+    <p>Your simple guide to training every part of your body — muscle groups, workout types, splits, and how to start safely.</p>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#muscle-groups">Muscle Groups</a>
+      <a href="#workout-types">Workout Types</a>
+      <a href="#splits">Splits</a>
+      <a href="#equipment">Equipment</a>
+      <a href="#recovery">Recovery</a>
+      <a href="#start">Get Started</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <section class="intro" id="about">
+      <h2>Why Work Out?</h2>
+      <p>
+        Regular exercise builds stronger muscles and bones, improves heart health, boosts mood,
+        and helps you move better in everyday life. You do not need a perfect plan on day one —
+        you need consistency, good form, and a mix of training styles that match your goals.
+      </p>
+      <p>
+        This blog breaks down <strong>what body parts you can train</strong>, <strong>types of workouts</strong>,
+        <strong>weekly split examples</strong>, and practical tips so you can build a routine that fits
+        home, gym, or outdoor training.
+      </p>
+    </section>
+
+    <article id="muscle-groups">
+      <img
+        src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=900&q=80"
+        alt="Person lifting dumbbells in a gym"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Muscle Groups</p>
+        <h2>Body Parts You Can Work Out</h2>
+        <p>
+          The human body has hundreds of muscles, but most workout plans organize training around
+          major <strong>muscle groups</strong>. Hitting each group 1–2 times per week with compound
+          and isolation exercises is enough for most beginners and intermediates.
+        </p>
+
+        <div class="muscle-grid">
+          <div class="muscle-card">
+            <strong>Chest (Pectorals)</strong>
+            <span>Push movements — bench press, push-ups, flyes. Works the front of the torso.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Back (Lats, Traps, Rhomboids)</strong>
+            <span>Pull movements — rows, pull-ups, lat pulldowns. Supports posture and pulling strength.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Shoulders (Deltoids)</strong>
+            <span>Overhead press, lateral raises, front raises. Three heads: front, side, rear.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Biceps</strong>
+            <span>Curls and pulling exercises. Flex the elbow and assist in pulling.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Triceps</strong>
+            <span>Dips, pushdowns, close-grip press. Extend the elbow; key for pushing power.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Core (Abs &amp; Obliques)</strong>
+            <span>Planks, crunches, leg raises, rotations. Stabilizes the spine and transfers force.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Quadriceps (Front Thigh)</strong>
+            <span>Squats, lunges, leg press. Extend the knee; largest leg muscle group.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Hamstrings (Back Thigh)</strong>
+            <span>Romanian deadlifts, leg curls, good mornings. Bend the knee and extend the hip.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Glutes</strong>
+            <span>Hip thrusts, squats, step-ups. Power for running, jumping, and hip extension.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Calves (Gastrocnemius &amp; Soleus)</strong>
+            <span>Calf raises. Point the foot; important for walking, running, and ankle stability.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Forearms &amp; Grip</strong>
+            <span>Farmer carries, wrist curls, dead hangs. Supports pulling and everyday carry tasks.</span>
+          </div>
+          <div class="muscle-card">
+            <strong>Hip Flexors &amp; Adductors</strong>
+            <span>Lunges, Copenhagen planks, side lunges. Often trained with leg and core work.</span>
+          </div>
+        </div>
+
+        <h3>Upper Body vs. Lower Body vs. Full Body</h3>
+        <ul>
+          <li><strong>Upper body</strong> — chest, back, shoulders, arms, and core.</li>
+          <li><strong>Lower body</strong> — quads, hamstrings, glutes, calves, and hips.</li>
+          <li><strong>Full body</strong> — combines upper and lower in one session (great for 2–3 days/week).</li>
+        </ul>
+
+        <h3>Example Exercises by Muscle Group</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Muscle Group</th>
+              <th>Beginner</th>
+              <th>Intermediate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Chest</td><td>Push-ups, dumbbell press</td><td>Barbell bench, incline press</td></tr>
+            <tr><td>Back</td><td>Lat pulldown, dumbbell row</td><td>Pull-ups, barbell row</td></tr>
+            <tr><td>Shoulders</td><td>Dumbbell press, lateral raise</td><td>Overhead press, face pulls</td></tr>
+            <tr><td>Legs</td><td>Bodyweight squat, glute bridge</td><td>Back squat, Romanian deadlift</td></tr>
+            <tr><td>Core</td><td>Plank, dead bug</td><td>Hanging leg raise, pallof press</td></tr>
+          </tbody>
+        </table>
+
+        <div class="tip-box">
+          <strong>Pro tip:</strong> Prioritize compound lifts (squat, hinge, push, pull) first — they train
+          multiple muscles at once and give you the most return per minute of training.
+        </div>
+      </div>
+    </article>
+
+    <article id="workout-types">
+      <img
+        src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=900&q=80"
+        alt="Athlete doing a high-intensity workout outdoors"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Workout Types</p>
+        <h2>Types of Workouts</h2>
+        <p>
+          Different workout styles stress your body in different ways. A balanced program usually
+          mixes strength, conditioning, and mobility — not just one style every day.
+        </p>
+
+        <h3>1. Strength Training (Resistance)</h3>
+        <p>
+          Lifting weights, bands, or bodyweight to build muscle and strength. Use 3–6 sets of
+          5–12 reps for muscle growth; heavier loads (1–5 reps) for max strength.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Barbells</span>
+          <span class="tag">Dumbbells</span>
+          <span class="tag">Machines</span>
+          <span class="tag">Bodyweight</span>
+        </div>
+
+        <h3>2. Cardiovascular (Aerobic)</h3>
+        <p>
+          Steady activity that raises heart rate for 20–60+ minutes. Improves endurance and heart
+          and lung health. Examples: jogging, cycling, swimming, brisk walking, rowing.
+        </p>
+
+        <h3>3. HIIT (High-Intensity Interval Training)</h3>
+        <p>
+          Short bursts of hard effort followed by rest. Efficient for conditioning and calorie burn.
+          Example: 30 seconds sprint, 90 seconds walk, repeat 8–10 rounds.
+        </p>
+
+        <h3>4. Circuit Training</h3>
+        <p>
+          Move through 4–8 exercises back-to-back with little rest. Combines strength and cardio.
+          Great when time is limited.
+        </p>
+
+        <h3>5. Flexibility &amp; Mobility</h3>
+        <p>
+          Stretching, yoga, and dynamic warm-ups improve range of motion and recovery. Do 5–10
+          minutes before workouts and dedicated sessions 1–2× per week.
+        </p>
+
+        <h3>6. Plyometrics &amp; Power</h3>
+        <p>
+          Explosive movements — box jumps, jump squats, medicine ball throws. Builds speed and
+          reactive strength. Best after a solid strength base.
+        </p>
+
+        <h3>7. Functional / Athletic Training</h3>
+        <p>
+          Movements that mimic real life or sport: carries, sled pushes, agility drills, kettlebell
+          swings. Improves coordination and full-body power.
+        </p>
+
+        <h3>8. Isolation vs. Compound</h3>
+        <ul>
+          <li><strong>Compound</strong> — squat, deadlift, press, row (multi-joint, multi-muscle).</li>
+          <li><strong>Isolation</strong> — curls, leg extensions, lateral raises (single joint, one focus).</li>
+        </ul>
+        <p>Use compounds for the bulk of your session; add isolation to target weak points or aesthetics.</p>
+      </div>
+    </article>
+
+    <article id="splits">
+      <img
+        src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=900&q=80"
+        alt="Gym equipment including barbells and weight plates"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Weekly Splits</p>
+        <h2>Workout Splits — How to Organize Your Week</h2>
+        <p>
+          A <strong>split</strong> is how you divide muscle groups across the week. Pick one that
+          matches your schedule and recovery ability.
+        </p>
+
+        <h3>Full Body (2–3 days/week)</h3>
+        <p>Train all major groups each session. Ideal for beginners or busy schedules.</p>
+        <ul>
+          <li>Mon / Wed / Fri — squat, push, pull, core each day</li>
+          <li>Example: squat, bench press, row, plank</li>
+        </ul>
+
+        <h3>Upper / Lower (4 days/week)</h3>
+        <p>Alternate upper and lower body days for more volume per muscle group.</p>
+        <ul>
+          <li>Mon — Upper · Tue — Lower · Thu — Upper · Fri — Lower</li>
+        </ul>
+
+        <h3>Push / Pull / Legs (3–6 days/week)</h3>
+        <p>Classic bodybuilding split. Push = chest, shoulders, triceps. Pull = back, biceps. Legs = quads, hamstrings, glutes, calves.</p>
+        <ul>
+          <li>Mon — Push · Tue — Pull · Wed — Legs · (repeat or rest)</li>
+        </ul>
+
+        <h3>Bro Split (5 days/week)</h3>
+        <p>One major group per day: chest, back, shoulders, arms, legs. High volume per session; needs good sleep and nutrition.</p>
+
+        <h3>Sample Beginner Week</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Focus</th>
+              <th>Sample Session</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Monday</td><td>Full body A</td><td>Squat, push-ups, dumbbell row, plank</td></tr>
+            <tr><td>Tuesday</td><td>Rest or light walk</td><td>20–30 min easy cardio</td></tr>
+            <tr><td>Wednesday</td><td>Full body B</td><td>Lunge, overhead press, lat pulldown, dead bug</td></tr>
+            <tr><td>Thursday</td><td>Rest</td><td>Stretching or yoga</td></tr>
+            <tr><td>Friday</td><td>Full body C</td><td>Hip hinge, incline press, face pull, side plank</td></tr>
+            <tr><td>Weekend</td><td>Active recovery</td><td>Hike, bike, or sport you enjoy</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article id="equipment">
+      <img
+        src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=900&q=80"
+        alt="Modern gym with free weights and machines"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Equipment</p>
+        <h2>Equipment You Can Train With</h2>
+
+        <h3>No Equipment (Bodyweight)</h3>
+        <p>Push-ups, squats, lunges, planks, burpees, pull-ups (if you have a bar). Perfect for home or travel.</p>
+
+        <h3>Resistance Bands</h3>
+        <p>Cheap, portable, and joint-friendly. Great for warm-ups, glute work, and adding resistance to bodyweight moves.</p>
+
+        <h3>Dumbbells &amp; Kettlebells</h3>
+        <p>Versatile for upper and lower body. Kettlebells add swings, cleans, and conditioning flows.</p>
+
+        <h3>Barbells &amp; Racks</h3>
+        <p>Best for heavy squats, deadlifts, and presses. The standard for progressive strength training.</p>
+
+        <h3>Machines &amp; Cables</h3>
+        <p>Guided path for beginners; cables allow constant tension and many angles for isolation work.</p>
+
+        <h3>Cardio Machines</h3>
+        <p>Treadmill, bike, rower, elliptical, stair climber — pick what you enjoy and can sustain.</p>
+      </div>
+    </article>
+
+    <article id="recovery">
+      <img
+        src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&q=80"
+        alt="Person stretching on a yoga mat after exercise"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Recovery &amp; Nutrition</p>
+        <h2>Recovery, Rest &amp; Fuel</h2>
+        <p>Muscles grow when you recover — not only when you train. Skipping rest leads to burnout and injury.</p>
+
+        <h3>Rest Days</h3>
+        <ul>
+          <li>Take at least 1–2 full rest days per week.</li>
+          <li>Same muscle group: allow 48 hours before hard training again (beginners may need more).</li>
+          <li>Sleep 7–9 hours — this is when growth hormone peaks and tissue repairs.</li>
+        </ul>
+
+        <h3>Nutrition Basics</h3>
+        <ul>
+          <li><strong>Protein</strong> — roughly 0.7–1 g per pound of body weight daily for muscle repair.</li>
+          <li><strong>Carbs</strong> — fuel for intense training; do not fear them if you are active.</li>
+          <li><strong>Fats</strong> — hormones and joint health; include nuts, olive oil, fish.</li>
+          <li><strong>Water</strong> — drink steadily through the day, more around workouts.</li>
+        </ul>
+
+        <h3>Warm-Up &amp; Cool-Down</h3>
+        <p>
+          Spend 5–10 minutes warming up: light cardio plus dynamic stretches (leg swings, arm circles).
+          After training, walk and stretch major muscles you used.
+        </p>
+
+        <div class="tip-box">
+          <strong>Safety first:</strong> Learn form before adding weight. Stop if you feel sharp pain.
+          When in doubt, start lighter and progress slowly — consistency beats intensity every time.
+        </div>
+      </div>
+    </article>
+
+    <article id="start">
+      <img
+        src="https://images.unsplash.com/photo-1518611012118-696072aa579a?w=900&q=80"
+        alt="Group fitness class working out together"
+      >
+      <div class="article-body">
+        <p class="post-meta">Training Guide · Getting Started</p>
+        <h2>How to Start Your Workout Journey</h2>
+        <ol>
+          <li><strong>Define your goal</strong> — strength, fat loss, endurance, general health, or sport performance.</li>
+          <li><strong>Pick 2–4 days per week</strong> you can actually stick to.</li>
+          <li><strong>Choose a split</strong> — full body 3×/week is the simplest starting point.</li>
+          <li><strong>Learn 5–8 core movements</strong> — squat, hinge, push, pull, carry, plank, lunge, row.</li>
+          <li><strong>Track progress</strong> — reps, weight, or time. Small weekly improvements add up.</li>
+          <li><strong>Be patient</strong> — visible changes often take 8–12 weeks of consistent training.</li>
+        </ol>
+
+        <h3>Quick Reference: Training by Goal</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Goal</th>
+              <th>Focus</th>
+              <th>Weekly Mix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Build muscle</td><td>Strength, 8–12 reps</td><td>3–5 lifting days + rest</td></tr>
+            <tr><td>Lose fat</td><td>Strength + cardio</td><td>3 lift days + 2–3 cardio/HIIT</td></tr>
+            <tr><td>Endurance</td><td>Cardio base</td><td>3–5 cardio sessions, 1–2 strength</td></tr>
+            <tr><td>General health</td><td>Balanced</td><td>2–3 full body + daily walking</td></tr>
+          </tbody>
+        </table>
+
+        <p>
+          You now have a map of every major body part, workout style, and how to structure your week.
+          Start where you are, progress gradually, and keep showing up — that is what transforms your body
+          and your health over time.
+        </p>
+      </div>
+    </article>
+
+  </main>
+
+  <footer>
+    <p>© 2026 Iron &amp; Motion. Built with HTML only — open <code>workout-blog.html</code> in any browser.</p>
+  </footer>
+
+</body>
+</html>
