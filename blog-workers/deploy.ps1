@@ -1,28 +1,93 @@
-# Deploy to Cloudflare Workers + D1 (see SKILL.md)
-# Prerequisites: Node.js 18+, npx wrangler login
+# Deploy blog-workers to Cloudflare (Windows-friendly)
+# Double-click deploy.bat or run: powershell -File deploy.ps1
 
+$ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Error "Node.js/npm required. Install from https://nodejs.org/"
-    exit 1
+function Ensure-Node {
+    if (Get-Command npm -ErrorAction SilentlyContinue) {
+        Write-Host "Using system Node: $(node --version)"
+        return
+    }
+
+    $nodeDir = Join-Path $env:TEMP "node-portable"
+    $npx = Join-Path $nodeDir "npx.cmd"
+
+    if (-not (Test-Path $npx)) {
+        Write-Host "Node.js not found. Downloading portable Node.js (one-time)..."
+        $zip = Join-Path $env:TEMP "node-win.zip"
+        $extract = Join-Path $env:TEMP "node-extract"
+        $url = "https://nodejs.org/dist/v22.14.0/node-v22.14.0-win-x64.zip"
+
+        Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+        if (Test-Path $extract) { Remove-Item $extract -Recurse -Force }
+        Expand-Archive -Path $zip -DestinationPath $extract -Force
+        if (Test-Path $nodeDir) { Remove-Item $nodeDir -Recurse -Force }
+        Move-Item (Join-Path $extract "node-v22.14.0-win-x64") $nodeDir
+        Remove-Item $zip -Force -ErrorAction SilentlyContinue
+        Remove-Item $extract -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    $env:Path = "$nodeDir;$env:Path"
+    Write-Host "Using portable Node: $(node --version)"
 }
 
-npm install
+function Ensure-CloudflareLogin {
+    $who = & npx wrangler whoami 2>&1 | Out-String
+    if ($who -notmatch "not authenticated") {
+        Write-Host "Cloudflare: already logged in."
+        return
+    }
 
-$dbJson = npx wrangler d1 create simple-blog-db 2>&1 | Out-String
-if ($dbJson -match '"database_id":\s*"([a-f0-9-]+)"') {
-    $dbId = $Matches[1]
-    $config = Get-Content wrangler.jsonc -Raw
-    $config = $config -replace "PLACEHOLDER", $dbId
-    Set-Content wrangler.jsonc $config -NoNewline
-    Write-Host "Updated wrangler.jsonc with database_id: $dbId"
+    Write-Host ""
+    Write-Host "Cloudflare login required (one-time)."
+    Write-Host 'Your browser will open - click Allow to authorize Wrangler.'
+    Write-Host ""
+
+    & npx wrangler login
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Login failed. Run this script again and complete the browser step."
+    }
+
+    $who = & npx wrangler whoami 2>&1 | Out-String
+    if ($who -match "not authenticated") {
+        Write-Error "Still not authenticated after login. Try: npx wrangler login"
+    }
+    Write-Host "Cloudflare login OK."
 }
 
-npx wrangler d1 execute simple-blog-db --remote --file=schema.sql -y
-npx wrangler deploy
+function Sync-WorkoutBlog {
+    $src = Join-Path (Split-Path $PSScriptRoot -Parent) "workout-blog.html"
+    $dst = Join-Path $PSScriptRoot "public\workout-blog.html"
+    if (Test-Path $src) {
+        Copy-Item $src $dst -Force
+        Write-Host "Synced workout-blog.html to public/"
+    }
+}
 
-Write-Host "Upload SECRET_KEY secret:"
-python -c "import secrets; print(secrets.token_hex(32))" | npx wrangler secret put SECRET_KEY
+Write-Host "=== Blog Workers Deploy ===" -ForegroundColor Cyan
+Ensure-Node
+Sync-WorkoutBlog
 
-Write-Host "Done! Visit the URL printed above."
+Write-Host "Installing dependencies..."
+& npm install
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+Ensure-CloudflareLogin
+
+Write-Host "Applying database schema (remote)..."
+& npx wrangler d1 execute simple-blog-db --remote --file=schema.sql -y
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "Schema apply had issues (may be OK if tables already exist)."
+}
+
+Write-Host "Deploying to Cloudflare Workers..."
+& npx wrangler deploy
+if ($LASTEXITCODE -ne 0) { exit 1 }
+
+Write-Host ""
+Write-Host "=== Deploy complete ===" -ForegroundColor Green
+Write-Host 'Blog home:    https://simple-blog-by-n.dazelu.workers.dev/'
+Write-Host 'Workout blog: https://simple-blog-by-n.dazelu.workers.dev/workout-blog.html'
+Write-Host 'Short link:   https://simple-blog-by-n.dazelu.workers.dev/workout'
+Write-Host ""
