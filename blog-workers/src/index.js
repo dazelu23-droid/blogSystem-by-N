@@ -258,6 +258,8 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+app.get("/workout", (c) => c.redirect("/workout-blog.html", 302));
+
 app.get("/", async (c) => {
   const session = await getSession(c);
   await saveSession(c, session);
