@@ -67,3 +67,9 @@ def validate_signup(username, email, password):
     if not password or len(password) < 8:
         errors.append("Password must be at least 8 characters.")
     return errors
+
+
+def validate_password(password):
+    if not password or len(password) < 8:
+        return ["Password must be at least 8 characters."]
+    return []

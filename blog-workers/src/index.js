@@ -98,6 +98,67 @@ function randomToken() {
   return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+async function hashResetToken(token) {
+  const data = new TextEncoder().encode(token);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function resetTokenExpiry() {
+  const expires = new Date(Date.now() + 60 * 60 * 1000);
+  return expires.toISOString().slice(0, 19).replace("T", " ");
+}
+
+async function createPasswordResetToken(c, userId) {
+  const token = randomToken() + randomToken();
+  const tokenHash = await hashResetToken(token);
+  await c.env.DB.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").bind(userId).run();
+  await c.env.DB.prepare(
+    "INSERT INTO password_reset_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)"
+  ).bind(userId, tokenHash, resetTokenExpiry()).run();
+  return token;
+}
+
+async function getUserIdForResetToken(c, token) {
+  const tokenHash = await hashResetToken(token);
+  const row = await c.env.DB.prepare(
+    "SELECT user_id FROM password_reset_tokens WHERE token_hash = ? AND expires_at > datetime('now')"
+  ).bind(tokenHash).first();
+  return row?.user_id || null;
+}
+
+async function updateUserPassword(c, userId, passwordHash) {
+  await c.env.DB.prepare("UPDATE users SET password_hash = ? WHERE id = ?").bind(passwordHash, userId).run();
+  await c.env.DB.prepare("DELETE FROM password_reset_tokens WHERE user_id = ?").bind(userId).run();
+}
+
+async function sendPasswordResetEmail(c, toEmail, resetUrl) {
+  const apiKey = c.env.RESEND_API_KEY;
+  const fromAddr = c.env.SMTP_FROM || "noreply@example.com";
+  if (!apiKey) {
+    console.log(`Password reset for ${toEmail}: ${resetUrl}`);
+    return false;
+  }
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromAddr,
+      to: [toEmail],
+      subject: "Reset your blog password",
+      text: `You requested a password reset for your blog account.\n\nOpen this link to choose a new password (valid for 1 hour):\n${resetUrl}\n\nIf you did not request this, you can ignore this email.`,
+    }),
+  });
+  return resp.ok;
+}
+
+function resetPasswordUrl(c, token) {
+  return new URL(`/reset-password/${token}`, c.req.url).href;
+}
+
 function securityHeaders(c) {
   c.header("Content-Security-Policy", "default-src 'self'");
   c.header("X-Content-Type-Options", "nosniff");
@@ -274,6 +335,7 @@ app.get("/login", async (c) => {
 <div class="form-group"><label for="username">Username</label><input type="text" id="username" name="username" required></div>
 <div class="form-group"><label for="password">Password</label><input type="password" id="password" name="password" required></div>
 <button type="submit" class="btn btn-primary">Log in</button></form>
+<p class="form-hint"><a href="/forgot-password">Forgot password?</a></p>
 <p class="form-hint">No account? <a href="/signup">Sign up</a></p></div>`), session);
 });
 
@@ -293,6 +355,82 @@ app.post("/login", async (c) => {
   session.csrf = randomToken();
   await saveSession(c, session);
   return c.redirect(next, 302);
+});
+
+app.get("/forgot-password", async (c) => {
+  const session = await getSession(c);
+  await saveSession(c, session);
+  return layout(c, "Forgot password", raw(`
+<div class="auth-form"><h1>Forgot password</h1>
+<p class="form-hint">Enter the email address for your account. We will send a reset link if it is registered.</p>
+<form method="post" action="/forgot-password"><input type="hidden" name="csrf_token" value="${session.csrf}">
+<div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
+<button type="submit" class="btn btn-primary">Send reset link</button></form>
+<p class="form-hint"><a href="/login">Back to log in</a></p></div>`), session);
+});
+
+app.post("/forgot-password", async (c) => {
+  const session = c.get("session") || await getSession(c);
+  const fd = c.get("parsedBody") || await c.req.parseBody();
+  const email = String(fd.email || "").trim();
+  if (!email) {
+    securityHeaders(c);
+    return c.text("Please enter your email address.", 400);
+  }
+  const message = "If that email is registered, we sent a link to reset your password. Check your inbox.";
+  const user = await c.env.DB.prepare("SELECT * FROM users WHERE email = ?").bind(email.toLowerCase()).first();
+  if (user) {
+    const token = await createPasswordResetToken(c, user.id);
+    await sendPasswordResetEmail(c, user.email, resetPasswordUrl(c, token));
+  }
+  await saveSession(c, session);
+  return layout(c, "Forgot password", raw(`
+<div class="auth-form"><h1>Forgot password</h1>
+<p class="form-success">${escapeHtml(message)}</p>
+<p class="form-hint"><a href="/login">Back to log in</a></p></div>`), session);
+});
+
+app.get("/reset-password/:token", async (c) => {
+  const session = await getSession(c);
+  const token = c.req.param("token");
+  const userId = await getUserIdForResetToken(c, token);
+  if (!userId) {
+    await saveSession(c, session);
+    return layout(c, "Reset password", raw(`
+<div class="auth-form"><h1>Reset password</h1>
+<ul class="form-errors"><li>This reset link is invalid or has expired.</li></ul>
+<p class="form-hint"><a href="/forgot-password">Request a new reset link</a></p></div>`), session);
+  }
+  await saveSession(c, session);
+  return layout(c, "Reset password", raw(`
+<div class="auth-form"><h1>Reset password</h1>
+<form method="post" action="/reset-password/${escapeHtml(token)}"><input type="hidden" name="csrf_token" value="${session.csrf}">
+<div class="form-group"><label for="password">New password</label><input type="password" id="password" name="password" required minlength="8"></div>
+<div class="form-group"><label for="password_confirm">Confirm new password</label><input type="password" id="password_confirm" name="password_confirm" required minlength="8"></div>
+<button type="submit" class="btn btn-primary">Update password</button></form></div>`), session);
+});
+
+app.post("/reset-password/:token", async (c) => {
+  const session = c.get("session") || await getSession(c);
+  const token = c.req.param("token");
+  const userId = await getUserIdForResetToken(c, token);
+  if (!userId) {
+    securityHeaders(c);
+    return c.text("This reset link is invalid or has expired.", 400);
+  }
+  const fd = c.get("parsedBody") || await c.req.parseBody();
+  const password = String(fd.password || "");
+  const passwordConfirm = String(fd.password_confirm || "");
+  const errors = [];
+  if (!password || password.length < 8) errors.push("Password must be at least 8 characters.");
+  if (password !== passwordConfirm) errors.push("Passwords do not match.");
+  if (errors.length) {
+    securityHeaders(c);
+    return c.text(errors.join(" "), 400);
+  }
+  const hash = await hashPassword(password);
+  await updateUserPassword(c, userId, hash);
+  return c.redirect("/login", 302);
 });
 
 app.post("/logout", async (c) => {

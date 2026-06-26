@@ -46,6 +46,14 @@ def init_db():
             kind TEXT NOT NULL CHECK (kind IN ('like', 'dislike')),
             UNIQUE(post_id, user_id)
         );
+
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            token_hash TEXT NOT NULL UNIQUE,
+            expires_at TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
     """)
     conn.commit()
     conn.close()

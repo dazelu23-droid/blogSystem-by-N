@@ -1,5 +1,11 @@
+import hashlib
 import re
+import secrets
+from datetime import datetime, timedelta, timezone
+
 from db import get_db
+
+RESET_TOKEN_HOURS = 1
 
 
 def get_user_by_id(user_id):
@@ -16,6 +22,72 @@ def get_user_by_username(username):
     ).fetchone()
     conn.close()
     return dict(row) if row else None
+
+
+def get_user_by_email(email):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT * FROM users WHERE email = ?", (email.lower(),)
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def hash_reset_token(token):
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def create_password_reset_token(user_id):
+    token = secrets.token_urlsafe(32)
+    token_hash = hash_reset_token(token)
+    expires_at = (
+        datetime.now(timezone.utc) + timedelta(hours=RESET_TOKEN_HOURS)
+    ).strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db()
+    conn.execute("DELETE FROM password_reset_tokens WHERE user_id = ?", (user_id,))
+    conn.execute(
+        """
+        INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
+        VALUES (?, ?, ?)
+        """,
+        (user_id, token_hash, expires_at),
+    )
+    conn.commit()
+    conn.close()
+    return token
+
+
+def get_user_id_for_reset_token(token):
+    token_hash = hash_reset_token(token)
+    conn = get_db()
+    row = conn.execute(
+        """
+        SELECT user_id FROM password_reset_tokens
+        WHERE token_hash = ? AND expires_at > datetime('now')
+        """,
+        (token_hash,),
+    ).fetchone()
+    conn.close()
+    return row["user_id"] if row else None
+
+
+def update_user_password(user_id, password_hash):
+    conn = get_db()
+    conn.execute(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        (password_hash, user_id),
+    )
+    conn.execute("DELETE FROM password_reset_tokens WHERE user_id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+
+def delete_reset_token(token):
+    token_hash = hash_reset_token(token)
+    conn = get_db()
+    conn.execute("DELETE FROM password_reset_tokens WHERE token_hash = ?", (token_hash,))
+    conn.commit()
+    conn.close()
 
 
 def create_user(username, email, password_hash):

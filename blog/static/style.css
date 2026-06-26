@@ -501,6 +501,15 @@ body {
   color: var(--danger);
 }
 
+.form-success {
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem;
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid #16a34a;
+  border-radius: 8px;
+  color: #15803d;
+}
+
 .form-error {
   color: var(--danger);
   font-size: 0.875rem;

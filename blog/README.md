@@ -9,6 +9,7 @@ A complete personal blog built with Flask, SQLite, and Jinja2 templates.
 - Comments and like/dislike reactions (JSON API)
 - Case-insensitive search with wildcard escaping
 - Light/dark theme toggle (localStorage)
+- Password reset via email link
 - CSRF protection on all state-changing requests
 - Security headers (CSP, X-Frame-Options, nosniff)
 
@@ -21,6 +22,17 @@ python app.py
 ```
 
 Visit http://localhost:5001
+
+### Password reset email (optional)
+
+Set SMTP environment variables to send reset links by email:
+
+- `SMTP_HOST`, `SMTP_PORT` (default `587`)
+- `SMTP_USER`, `SMTP_PASSWORD`
+- `SMTP_FROM` (optional sender address)
+- `SMTP_TLS` (default `1`)
+
+For the Cloudflare Workers deployment, set `RESEND_API_KEY` and `SMTP_FROM` instead.
 
 ## Run Tests
 
