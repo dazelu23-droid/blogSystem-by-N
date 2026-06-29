@@ -66,6 +66,15 @@ def create_app(test_config=None):
     def workout_blog():
         return send_from_directory(project_root, "workout-blog.html")
 
+    workouts_dir = os.path.join(project_root, "blog-workers", "public", "workouts")
+
+    @app.get("/workouts/<path:filename>")
+    def workout_guide_page(filename):
+        if filename not in ("strength.html", "cardio.html", "hiit.html", "flexibility.html"):
+            from flask import abort
+            abort(404)
+        return send_from_directory(workouts_dir, filename)
+
     return app
 
 

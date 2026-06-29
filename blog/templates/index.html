@@ -13,25 +13,62 @@
   <h2 id="workout-cta-title">Complete Workout &amp; Fitness Guide</h2>
   <p>Learn how to work out properly — muscle groups, training types, weekly splits, form, recovery, nutrition, and workout examples with images.</p>
   <div class="workout-cta-gallery">
-    <figure>
-      <img src="{{ url_for('static', filename='images/workout-strength.svg') }}" alt="Strength training example with barbell">
-      <figcaption>Strength</figcaption>
-    </figure>
-    <figure>
-      <img src="{{ url_for('static', filename='images/workout-cardio.svg') }}" alt="Cardio running workout example">
-      <figcaption>Cardio</figcaption>
-    </figure>
-    <figure>
-      <img src="{{ url_for('static', filename='images/workout-hiit.svg') }}" alt="HIIT interval training example">
-      <figcaption>HIIT</figcaption>
-    </figure>
-    <figure>
-      <img src="{{ url_for('static', filename='images/workout-flexibility.svg') }}" alt="Flexibility and yoga workout example">
-      <figcaption>Flexibility</figcaption>
-    </figure>
+    <a href="/workouts/strength.html" class="workout-card-link">
+      <figure>
+        <img src="{{ url_for('static', filename='images/workout-strength.svg') }}" alt="Strength training example with barbell">
+        <figcaption>Strength</figcaption>
+      </figure>
+    </a>
+    <a href="/workouts/cardio.html" class="workout-card-link">
+      <figure>
+        <img src="{{ url_for('static', filename='images/workout-cardio.svg') }}" alt="Cardio running workout example">
+        <figcaption>Cardio</figcaption>
+      </figure>
+    </a>
+    <a href="/workouts/hiit.html" class="workout-card-link">
+      <figure>
+        <img src="{{ url_for('static', filename='images/workout-hiit.svg') }}" alt="HIIT interval training example">
+        <figcaption>HIIT</figcaption>
+      </figure>
+    </a>
+    <a href="/workouts/flexibility.html" class="workout-card-link">
+      <figure>
+        <img src="{{ url_for('static', filename='images/workout-flexibility.svg') }}" alt="Flexibility and yoga workout example">
+        <figcaption>Flexibility</figcaption>
+      </figure>
+    </a>
   </div>
-  <a href="/workout-blog.html" class="btn-workout-info">VIEW INFORMATION OF MY BLOG WEBSITE</a>
+  <button type="button" class="btn-workout-info" id="workout-picker-open">VIEW INFORMATION OF MY BLOG WEBSITE</button>
 </section>
+
+<div id="workout-picker" class="workout-modal" hidden role="dialog" aria-modal="true" aria-labelledby="workout-picker-title">
+  <div class="workout-modal-backdrop"></div>
+  <div class="workout-modal-panel">
+    <h3 id="workout-picker-title">What type of workout do you want to see?</h3>
+    <p>Choose a category below to open the full guide with exercises, examples, and tips.</p>
+    <div class="workout-picker-grid">
+      <a href="/workouts/strength.html" class="workout-picker-card">
+        <img src="{{ url_for('static', filename='images/workout-strength.svg') }}" alt="">
+        Strength Training
+      </a>
+      <a href="/workouts/cardio.html" class="workout-picker-card">
+        <img src="{{ url_for('static', filename='images/workout-cardio.svg') }}" alt="">
+        Cardio
+      </a>
+      <a href="/workouts/hiit.html" class="workout-picker-card">
+        <img src="{{ url_for('static', filename='images/workout-hiit.svg') }}" alt="">
+        HIIT
+      </a>
+      <a href="/workouts/flexibility.html" class="workout-picker-card">
+        <img src="{{ url_for('static', filename='images/workout-flexibility.svg') }}" alt="">
+        Flexibility
+      </a>
+    </div>
+    <div class="workout-modal-actions">
+      <button type="button" class="btn btn-secondary" id="workout-picker-close">Cancel</button>
+    </div>
+  </div>
+</div>
 
 {% if posts %}
   <span class="section-label">Latest</span>
@@ -51,4 +88,8 @@
     {% endif %}
   </div>
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='workout-picker.js') }}" defer></script>
 {% endblock %}
