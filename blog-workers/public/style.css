@@ -907,9 +907,93 @@ a {
   font-size: 0.82rem;
 }
 
+/* ── Workout guide CTA ── */
+
+.workout-cta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 1.75rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.workout-cta h2 {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.workout-cta > p {
+  margin: 0 auto 1.25rem;
+  max-width: 52ch;
+  color: var(--text-muted);
+  font-size: 0.98rem;
+}
+
+.workout-cta-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.workout-cta-gallery figure {
+  margin: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.workout-cta-gallery img {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+.workout-cta-gallery figcaption {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+
+.btn-workout-info {
+  display: inline-block;
+  padding: 1rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: #fff !important;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  max-width: 100%;
+  box-shadow: 0 4px 20px var(--accent-soft);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-workout-info:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  color: #fff;
+}
+
 /* ── Responsive ── */
 
 @media (max-width: 768px) {
+  .workout-cta-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .post-card {
     grid-template-columns: 1fr;
   }
@@ -930,6 +1014,11 @@ a {
 
   .page-hero-content {
     padding: 1.5rem;
+  }
+
+  .btn-workout-info {
+    font-size: 0.72rem;
+    padding: 0.9rem 1.1rem;
   }
 }
 

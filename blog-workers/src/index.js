@@ -199,7 +199,7 @@ function layout(c, title, body, session) {
 <header class="site-header"><div class="header-inner">
 <a href="/" class="logo"><span class="logo-mark">B</span> Blog</a>
 <nav class="nav-links">
-<a href="/">Home</a><a href="/search">Search</a>
+<a href="/">Home</a><a href="/search">Search</a><a href="/workout-blog.html">Workout Guide</a>
 ${user ? raw(`<a href="/new">New Post</a><span class="nav-user">${escapeHtml(user)}</span>
 <form method="post" action="/logout" class="logout-form"><input type="hidden" name="csrf_token" value="${csrf}">
 <button type="submit" class="btn btn-ghost">Log out</button></form>`)
@@ -236,7 +236,7 @@ ${user ? raw(`<a href="/new">New Post</a><span class="nav-user">${escapeHtml(use
 <div class="footer-brand"><a href="/" class="logo"><span class="logo-mark">B</span> Blog</a>
 <p>A simple personal blog — share your thoughts with the world.</p></div>
 <div class="footer-col"><h3>Explore</h3><ul>
-<li><a href="/">Home</a></li><li><a href="/search">Search</a></li>
+<li><a href="/">Home</a></li><li><a href="/search">Search</a></li><li><a href="/workout-blog.html">Workout Guide</a></li>
 ${user ? raw(`<li><a href="/new">New Post</a></li>`) : raw(`<li><a href="/signup">Sign up</a></li>`)}
 </ul></div>
 <div class="footer-col"><h3>Account</h3><ul>
@@ -298,6 +298,17 @@ app.get("/", async (c) => {
     "SELECT p.*, u.username AS author FROM posts p JOIN users u ON p.author_id = u.id ORDER BY p.created_at DESC, p.id DESC"
   ).all();
   const cards = (results || []).map((p) => postCardHtml(p)).join("");
+  const workoutCta = raw(`<section class="workout-cta" aria-labelledby="workout-cta-title">
+<h2 id="workout-cta-title">Complete Workout &amp; Fitness Guide</h2>
+<p>Learn how to work out properly — muscle groups, training types, weekly splits, form, recovery, nutrition, and workout examples with images.</p>
+<div class="workout-cta-gallery">
+<figure><img src="/images/workout-strength.svg" alt="Strength training example"><figcaption>Strength</figcaption></figure>
+<figure><img src="/images/workout-cardio.svg" alt="Cardio running example"><figcaption>Cardio</figcaption></figure>
+<figure><img src="/images/workout-hiit.svg" alt="HIIT interval training example"><figcaption>HIIT</figcaption></figure>
+<figure><img src="/images/workout-flexibility.svg" alt="Flexibility workout example"><figcaption>Flexibility</figcaption></figure>
+</div>
+<a href="/workout-blog.html" class="btn-workout-info">VIEW INFORMATION OF MY BLOG WEBSITE</a>
+</section>`);
   const hero = raw(`<section class="page-hero">
 <img src="/images/hero-banner.svg" alt="">
 <div class="page-hero-content">
@@ -305,8 +316,8 @@ app.get("/", async (c) => {
 <p>Discover ideas, updates, and voices from our community of writers.</p>
 </div></section>`);
   const body = results?.length
-    ? raw(`${hero}<span class="section-label">Latest</span><h1 class="page-title">Latest Posts</h1><div class="post-list">${cards}</div>`)
-    : raw(`${hero}<h1 class="page-title">Latest Posts</h1><div class="empty-state">
+    ? raw(`${hero}${workoutCta}<span class="section-label">Latest</span><h1 class="page-title">Latest Posts</h1><div class="post-list">${cards}</div>`)
+    : raw(`${hero}${workoutCta}<h1 class="page-title">Latest Posts</h1><div class="empty-state">
 <img src="/images/post-thumb-1.svg" alt="" width="120">
 <p>No posts yet. Be the first to write something!</p>
 ${session.user_id ? '<a href="/new" class="btn btn-primary">Write a post</a>' : '<a href="/signup" class="btn btn-primary">Sign up to post</a>'}</div>`);

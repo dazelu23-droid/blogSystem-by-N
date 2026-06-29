@@ -9,6 +9,30 @@
   </div>
 </section>
 
+<section class="workout-cta" aria-labelledby="workout-cta-title">
+  <h2 id="workout-cta-title">Complete Workout &amp; Fitness Guide</h2>
+  <p>Learn how to work out properly — muscle groups, training types, weekly splits, form, recovery, nutrition, and workout examples with images.</p>
+  <div class="workout-cta-gallery">
+    <figure>
+      <img src="{{ url_for('static', filename='images/workout-strength.svg') }}" alt="Strength training example with barbell">
+      <figcaption>Strength</figcaption>
+    </figure>
+    <figure>
+      <img src="{{ url_for('static', filename='images/workout-cardio.svg') }}" alt="Cardio running workout example">
+      <figcaption>Cardio</figcaption>
+    </figure>
+    <figure>
+      <img src="{{ url_for('static', filename='images/workout-hiit.svg') }}" alt="HIIT interval training example">
+      <figcaption>HIIT</figcaption>
+    </figure>
+    <figure>
+      <img src="{{ url_for('static', filename='images/workout-flexibility.svg') }}" alt="Flexibility and yoga workout example">
+      <figcaption>Flexibility</figcaption>
+    </figure>
+  </div>
+  <a href="/workout-blog.html" class="btn-workout-info">VIEW INFORMATION OF MY BLOG WEBSITE</a>
+</section>
+
 {% if posts %}
   <span class="section-label">Latest</span>
   <h1 class="page-title">Latest Posts</h1>

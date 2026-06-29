@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Cardio running workout">
+  <defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0ea5e9"/><stop offset="100%" stop-color="#0369a1"/></linearGradient></defs>
+  <rect width="320" height="200" fill="#0c4a6e"/>
+  <ellipse cx="160" cy="170" rx="120" ry="12" fill="#000" opacity="0.2"/>
+  <circle cx="130" cy="75" r="16" fill="#bae6fd"/>
+  <path d="M130 95 Q155 110 175 95 L190 130 L165 145 L150 115 Z" fill="#38bdf8"/>
+  <path d="M175 95 L210 85 L220 110 L195 125 Z" fill="#7dd3fc"/>
+  <text x="160" y="175" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif" font-size="14" font-weight="700">CARDIO</text>
+</svg>

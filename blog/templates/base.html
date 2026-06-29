@@ -83,6 +83,7 @@
         <ul>
           <li><a href="{{ url_for('posts.index') }}">Home</a></li>
           <li><a href="{{ url_for('search.search') }}">Search</a></li>
+          <li><a href="/workout-blog.html">Workout Guide</a></li>
           {% if current_user %}
             <li><a href="{{ url_for('posts.new_post') }}">New Post</a></li>
           {% else %}
