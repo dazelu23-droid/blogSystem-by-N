@@ -1,13 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Home — Blog{% endblock %}
 {% block content %}
-<h1 class="page-title">Latest Posts</h1>
+<section class="page-hero">
+  <img src="{{ url_for('static', filename='images/hero-banner.svg') }}" alt="">
+  <div class="page-hero-content">
+    <h1>Stories worth sharing</h1>
+    <p>Discover ideas, updates, and voices from our community of writers.</p>
+  </div>
+</section>
+
 {% if posts %}
+  <span class="section-label">Latest</span>
+  <h1 class="page-title">Latest Posts</h1>
   <div class="post-list">
     {% include "_post_list.html" %}
   </div>
 {% else %}
+  <h1 class="page-title">Latest Posts</h1>
   <div class="empty-state">
+    <img src="{{ url_for('static', filename='images/post-thumb-1.svg') }}" alt="" width="120">
     <p>No posts yet. Be the first to write something!</p>
     {% if current_user %}
       <a href="{{ url_for('posts.new_post') }}" class="btn btn-primary">Write a post</a>

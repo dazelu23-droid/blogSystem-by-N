@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-label="Abstract writing desk illustration">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#db2777"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#sky)"/>
+  <ellipse cx="600" cy="420" rx="520" ry="80" fill="#f8fafc" opacity="0.08"/>
+  <rect x="280" y="220" width="640" height="24" rx="12" fill="#fff" opacity="0.15"/>
+  <rect x="320" y="260" width="560" height="12" rx="6" fill="#fff" opacity="0.1"/>
+  <rect x="360" y="290" width="480" height="12" rx="6" fill="#fff" opacity="0.08"/>
+  <rect x="380" y="180" width="440" height="28" rx="8" fill="#fff" opacity="0.2"/>
+  <circle cx="900" cy="120" r="48" fill="#fbbf24" opacity="0.35"/>
+  <rect width="1200" height="400" fill="url(#glow)"/>
+</svg>

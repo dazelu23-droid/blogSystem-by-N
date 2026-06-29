@@ -4,14 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Blog{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script src="{{ url_for('static', filename='theme.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </head>
 <body>
   <header class="site-header">
-    <div class="container header-inner">
-      <a href="{{ url_for('posts.index') }}" class="logo">Blog</a>
+    <div class="header-inner">
+      <a href="{{ url_for('posts.index') }}" class="logo">
+        <span class="logo-mark">B</span> Blog
+      </a>
       <nav class="nav-links">
         <a href="{{ url_for('posts.index') }}">Home</a>
         <a href="{{ url_for('search.search') }}">Search</a>
@@ -66,8 +71,39 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>A simple personal blog — share your thoughts.</p>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="{{ url_for('posts.index') }}" class="logo">
+          <span class="logo-mark">B</span> Blog
+        </a>
+        <p>A simple personal blog — share your thoughts with the world.</p>
+      </div>
+      <div class="footer-col">
+        <h3>Explore</h3>
+        <ul>
+          <li><a href="{{ url_for('posts.index') }}">Home</a></li>
+          <li><a href="{{ url_for('search.search') }}">Search</a></li>
+          {% if current_user %}
+            <li><a href="{{ url_for('posts.new_post') }}">New Post</a></li>
+          {% else %}
+            <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Account</h3>
+        <ul>
+          {% if current_user %}
+            <li><span>{{ current_user }}</span></li>
+          {% else %}
+            <li><a href="{{ url_for('auth.login') }}">Log in</a></li>
+            <li><a href="{{ url_for('auth.signup') }}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; {{ 2026 }} Blog. Built with Flask.</p>
     </div>
   </footer>
 </body>

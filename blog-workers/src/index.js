@@ -160,9 +160,26 @@ function resetPasswordUrl(c, token) {
 }
 
 function securityHeaders(c) {
-  c.header("Content-Security-Policy", "default-src 'self'");
+  c.header("Content-Security-Policy", "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:");
   c.header("X-Content-Type-Options", "nosniff");
   c.header("X-Frame-Options", "DENY");
+}
+
+function postThumbUrl(id) {
+  const n = (Number(id) % 3) + 1;
+  return `/images/post-thumb-${n}.svg`;
+}
+
+function postCardHtml(p) {
+  return raw(`
+<article class="post-card">
+<div class="post-card-media"><img src="${postThumbUrl(p.id)}" alt="" loading="lazy"></div>
+<div class="post-card-body">
+<h2><a href="/post/${p.id}">${escapeHtml(p.title)}</a></h2>
+<p class="post-preview">${escapeHtml(truncatePreview(p.body))}</p>
+<div class="post-meta"><span class="post-author">${escapeHtml(p.author)}</span>
+<time datetime="${p.created_at}">${p.created_at}</time></div>
+</div></article>`);
 }
 
 function layout(c, title, body, session) {
@@ -173,11 +190,14 @@ function layout(c, title, body, session) {
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${title} — Blog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
 <script src="/theme.js" defer></script>
 </head><body>
-<header class="site-header"><div class="container header-inner">
-<a href="/" class="logo">Blog</a>
+<header class="site-header"><div class="header-inner">
+<a href="/" class="logo"><span class="logo-mark">B</span> Blog</a>
 <nav class="nav-links">
 <a href="/">Home</a><a href="/search">Search</a>
 ${user ? raw(`<a href="/new">New Post</a><span class="nav-user">${escapeHtml(user)}</span>
@@ -212,7 +232,18 @@ ${user ? raw(`<a href="/new">New Post</a><span class="nav-user">${escapeHtml(use
 </div>
 </div></header>
 <main class="container main-content">${body}</main>
-<footer class="site-footer"><div class="container"><p>A simple personal blog — share your thoughts.</p></div></footer>
+<footer class="site-footer"><div class="footer-inner">
+<div class="footer-brand"><a href="/" class="logo"><span class="logo-mark">B</span> Blog</a>
+<p>A simple personal blog — share your thoughts with the world.</p></div>
+<div class="footer-col"><h3>Explore</h3><ul>
+<li><a href="/">Home</a></li><li><a href="/search">Search</a></li>
+${user ? raw(`<li><a href="/new">New Post</a></li>`) : raw(`<li><a href="/signup">Sign up</a></li>`)}
+</ul></div>
+<div class="footer-col"><h3>Account</h3><ul>
+${user ? raw(`<li><span>${escapeHtml(user)}</span></li>`) : raw(`<li><a href="/login">Log in</a></li><li><a href="/signup">Sign up</a></li>`)}
+</ul></div></div>
+<div class="footer-bottom"><p>&copy; ${new Date().getFullYear()} Blog. Built on Cloudflare Workers.</p></div>
+</footer>
 </body></html>`);
 }
 
@@ -266,14 +297,18 @@ app.get("/", async (c) => {
   const { results } = await c.env.DB.prepare(
     "SELECT p.*, u.username AS author FROM posts p JOIN users u ON p.author_id = u.id ORDER BY p.created_at DESC, p.id DESC"
   ).all();
-  const cards = (results || []).map((p) => raw(`
-<article class="post-card"><h2><a href="/post/${p.id}">${escapeHtml(p.title)}</a></h2>
-<p class="post-preview">${escapeHtml(truncatePreview(p.body))}</p>
-<div class="post-meta"><span class="post-author">${escapeHtml(p.author)}</span>
-<time datetime="${p.created_at}">${p.created_at}</time></div></article>`)).join("");
+  const cards = (results || []).map((p) => postCardHtml(p)).join("");
+  const hero = raw(`<section class="page-hero">
+<img src="/images/hero-banner.svg" alt="">
+<div class="page-hero-content">
+<h1>Stories worth sharing</h1>
+<p>Discover ideas, updates, and voices from our community of writers.</p>
+</div></section>`);
   const body = results?.length
-    ? raw(`<h1 class="page-title">Latest Posts</h1><div class="post-list">${cards}</div>`)
-    : raw(`<h1 class="page-title">Latest Posts</h1><div class="empty-state"><p>No posts yet. Be the first to write something!</p>
+    ? raw(`${hero}<span class="section-label">Latest</span><h1 class="page-title">Latest Posts</h1><div class="post-list">${cards}</div>`)
+    : raw(`${hero}<h1 class="page-title">Latest Posts</h1><div class="empty-state">
+<img src="/images/post-thumb-1.svg" alt="" width="120">
+<p>No posts yet. Be the first to write something!</p>
 ${session.user_id ? '<a href="/new" class="btn btn-primary">Write a post</a>' : '<a href="/signup" class="btn btn-primary">Sign up to post</a>'}</div>`);
   return layout(c, "Home", body, session);
 });
@@ -465,7 +500,9 @@ app.get("/post/:id", async (c) => {
   const isAuthor = session.username === post.author;
   return layout(c, post.title, raw(`
 <script src="/post.js" defer></script>
-<article class="post-detail"><h1>${escapeHtml(post.title)}</h1>
+<article class="post-detail">
+<div class="post-detail-hero"><img src="${postThumbUrl(post.id)}" alt=""></div>
+<h1>${escapeHtml(post.title)}</h1>
 <div class="post-meta"><span class="post-author">${escapeHtml(post.author)}</span>
 <time datetime="${post.created_at}">${post.created_at}</time>
 ${post.updated_at ? '<span class="edited-marker">(edited)</span>' : ""}</div>
@@ -525,11 +562,7 @@ app.get("/search", async (c) => {
   const { results } = await c.env.DB.prepare(
     "SELECT p.*, u.username AS author FROM posts p JOIN users u ON p.author_id = u.id WHERE p.title LIKE ? ESCAPE '\\\\' OR p.body LIKE ? ESCAPE '\\\\' ORDER BY p.created_at DESC, p.id DESC"
   ).bind(pattern, pattern).all();
-  const cards = (results || []).map((p) => raw(`
-<article class="post-card"><h2><a href="/post/${p.id}">${escapeHtml(p.title)}</a></h2>
-<p class="post-preview">${escapeHtml(truncatePreview(p.body))}</p>
-<div class="post-meta"><span class="post-author">${escapeHtml(p.author)}</span>
-<time datetime="${p.created_at}">${p.created_at}</time></div></article>`)).join("");
+  const cards = (results || []).map((p) => postCardHtml(p)).join("");
   const body = results?.length
     ? raw(`<h1 class="page-title">Search</h1><form method="get" action="/search" class="search-form"><div class="search-row"><input type="search" name="q" value="${escapeHtml(q)}" maxlength="100"><button type="submit" class="btn btn-primary">Search</button></div></form><div class="post-list">${cards}</div>`)
     : raw(`<h1 class="page-title">Search</h1><div class="empty-state"><p>No posts match "${escapeHtml(q)}".</p></div>`);
