@@ -2,6 +2,8 @@
 
 A complete personal blog built with Flask, SQLite, and Jinja2 templates.
 
+**Live site:** [https://simple-blog-by-n.dazelu.workers.dev/](https://simple-blog-by-n.dazelu.workers.dev/)
+
 ## Features
 
 - User sign up / log in / log out (username-based, case-insensitive)
