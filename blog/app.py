@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session
+from flask import Flask, redirect, send_from_directory, session
 
 from auth import auth_bp
 from comments import comments_bp
@@ -37,7 +37,7 @@ def create_app(test_config=None):
     def security_headers(response):
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; style-src 'self' https://fonts.googleapis.com; "
-            "font-src https://fonts.gstatic.com; img-src 'self' data:"
+            "font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com"
         )
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -55,6 +55,16 @@ def create_app(test_config=None):
     app.register_blueprint(comments_bp)
     app.register_blueprint(reactions_bp)
     app.register_blueprint(search_bp)
+
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+    @app.get("/workout")
+    def workout_short():
+        return redirect("/workout-blog.html")
+
+    @app.get("/workout-blog.html")
+    def workout_blog():
+        return send_from_directory(project_root, "workout-blog.html")
 
     return app
 
