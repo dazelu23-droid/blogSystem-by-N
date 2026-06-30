@@ -1,8 +1,23 @@
 {% extends "base.html" %}
 {% block title %}{% if post and post.id %}Edit Post{% else %}New Post{% endif %} — Blog{% endblock %}
+{% block head %}
+{% if not post or not post.id %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/quill/quill.snow.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='quill-theme.css') }}">
+{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if not post or not post.id %}
+<script src="{{ url_for('static', filename='vendor/quill/quill.js') }}"></script>
+<script src="{{ url_for('static', filename='editor.js') }}" defer></script>
+{% endif %}
+{% endblock %}
 {% block content %}
-<div class="edit-form">
+<div class="edit-form{% if not post or not post.id %} edit-form--composer{% endif %}">
   <h1>{% if post and post.id %}Edit Post{% else %}New Post{% endif %}</h1>
+  {% if not post or not post.id %}
+  <p class="composer-lead">Compose with rich formatting — headings, emphasis, lists, quotes, code, and links.</p>
+  {% endif %}
   {% if errors %}
     <ul class="form-errors">
       {% for error in errors %}
@@ -14,13 +29,28 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <div class="form-group">
       <label for="title">Title</label>
-      <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required maxlength="200">
+      <input type="text" id="title" name="title" value="{{ post.title if post else '' }}" required maxlength="200"{% if not post or not post.id %} placeholder="Give your post a title"{% endif %}>
     </div>
     <div class="form-group">
+      {% if post and post.id %}
       <label for="body">Body</label>
       <textarea id="body" name="body" rows="12" required maxlength="20000">{{ post.body if post else '' }}</textarea>
+      {% else %}
+      <label for="quill-editor">Body</label>
+      <div class="quill-editor-wrap">
+        <div id="quill-editor" class="quill-editor"></div>
+        <textarea id="body" name="body" hidden required maxlength="20000">{{ post.body if post else '' }}</textarea>
+      </div>
+      <div class="editor-meta">
+        <span id="body-counter" class="char-counter">0 / 20,000</span>
+        <span class="editor-hint">Toolbar shortcuts: Ctrl+B, Ctrl+I, Ctrl+U</span>
+      </div>
+      <p id="body-error" class="form-error" hidden></p>
+      {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">{% if post and post.id %}Save changes{% else %}Publish{% endif %}</button>
+    <div class="{% if not post or not post.id %}form-actions{% endif %}">
+      <button type="submit" class="btn btn-primary">{% if post and post.id %}Save changes{% else %}Publish{% endif %}</button>
+    </div>
   </form>
 </div>
 {% endblock %}

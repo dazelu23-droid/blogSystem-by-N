@@ -41,10 +41,19 @@ function Ensure-CloudflareLogin {
 
     Write-Host ""
     Write-Host "Cloudflare login required (one-time)."
-    Write-Host 'Your browser will open - click Allow to authorize Wrangler.'
+    Write-Host "A login link will appear below — open it and click Allow."
     Write-Host ""
 
-    & npx wrangler login
+    $loginOut = & npx wrangler login --browser=false 2>&1 | Tee-Object -Variable loginLines
+    $loginText = ($loginLines | Out-String)
+    if ($loginText -match "(https://dash\.cloudflare\.com/oauth2/auth\?[^\s]+)") {
+        $url = $Matches[1]
+        Write-Host ""
+        Write-Host "Login URL:" -ForegroundColor Yellow
+        Write-Host $url
+        Write-Host ""
+        try { Start-Process $url } catch { Write-Host "Open the URL above in your browser if it did not open automatically." }
+    }
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Login failed. Run this script again and complete the browser step."
     }

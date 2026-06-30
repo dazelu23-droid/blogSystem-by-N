@@ -71,6 +71,14 @@ def test_unknown_post_404(client):
     assert resp.status_code == 404
 
 
+def test_new_post_page_has_quill_editor(auth_client):
+    resp = auth_client.get("/new")
+    assert resp.status_code == 200
+    assert b"quill-editor" in resp.data
+    assert b"vendor/quill/quill.js" in resp.data
+    assert b'rows="12"' not in resp.data
+
+
 def _csrf(client, path):
     import re
     resp = client.get(path)

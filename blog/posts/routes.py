@@ -10,6 +10,7 @@ from models import (
     truncate_preview,
     update_post,
 )
+from sanitize import is_body_empty, looks_like_html, render_post_body, sanitize_html, strip_html
 
 posts_bp = Blueprint("posts", __name__)
 
@@ -48,7 +49,9 @@ def detail(post_id):
     user_reaction = get_user_reaction(post_id, session.get("user_id"))
     return render_template(
         "post.html", post=post, comments=comments, counts=counts,
-        user_reaction=user_reaction, csrf_token=generate_csrf_token()
+        user_reaction=user_reaction, csrf_token=generate_csrf_token(),
+        post_body=render_post_body(post["body"]),
+        post_is_rich=looks_like_html(post["body"]),
     )
 
 
@@ -58,6 +61,12 @@ def new_post():
     if request.method == "GET":
         return render_template("edit.html", post=None, csrf_token=generate_csrf_token(), errors=[])
     errors, title, body = validate_post(request.form.get("title"), request.form.get("body"))
+    if not errors:
+        body = sanitize_html(body)
+        if is_body_empty(body):
+            errors.append("Body cannot be empty.")
+        elif len(strip_html(body)) > 20000:
+            errors.append("Body must be at most 20000 characters.")
     if errors:
         return render_template(
             "edit.html", post={"title": title, "body": body},

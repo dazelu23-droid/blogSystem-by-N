@@ -16,7 +16,7 @@
       <span class="edited-marker">(edited)</span>
     {% endif %}
   </div>
-  <div class="post-body">{{ post.body }}</div>
+  <div class="post-body{% if post_is_rich %} post-body--rich{% endif %}">{{ post_body }}</div>
 
   {% if current_user == post.author %}
   <div class="post-actions">

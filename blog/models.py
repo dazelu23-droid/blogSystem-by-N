@@ -1,5 +1,6 @@
-import hashlib
 import re
+
+import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -181,7 +182,9 @@ def _escape_like(s):
 
 
 def truncate_preview(text, length=150):
-    words = text.split()
+    plain = re.sub(r"<[^>]+>", " ", text or "")
+    plain = re.sub(r"\s+", " ", plain).strip()
+    words = plain.split()
     result = []
     total = 0
     for word in words:
@@ -192,7 +195,7 @@ def truncate_preview(text, length=150):
         total += len(word)
         result.append(word)
     preview = " ".join(result)
-    if preview != text.strip():
+    if preview != plain:
         preview += "..."
     return preview
 

@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { html, raw } from "hono/html";
+import { isBodyEmpty, looksLikeHtml, renderPostBody, sanitizeHtml, stripHtml } from "./sanitize.js";
 
 const app = new Hono();
 
@@ -16,7 +17,7 @@ function escapeHtml(s) {
 }
 
 function truncatePreview(text, length = 150) {
-  const words = text.trim().split(/\s+/);
+  const words = stripHtml(text).split(/\s+/).filter(Boolean);
   let result = [];
   let total = 0;
   for (const word of words) {
@@ -26,7 +27,8 @@ function truncatePreview(text, length = 150) {
     result.push(word);
   }
   const preview = result.join(" ");
-  return preview !== text.trim() ? preview + "..." : preview;
+  const plain = stripHtml(text);
+  return preview !== plain ? preview + "..." : preview;
 }
 
 function escapeLike(s) {
@@ -160,7 +162,10 @@ function resetPasswordUrl(c, token) {
 }
 
 function securityHeaders(c) {
-  c.header("Content-Security-Policy", "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:");
+  c.header(
+    "Content-Security-Policy",
+    "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com"
+  );
   c.header("X-Content-Type-Options", "nosniff");
   c.header("X-Frame-Options", "DENY");
 }
@@ -182,7 +187,7 @@ function postCardHtml(p) {
 </div></article>`);
 }
 
-function layout(c, title, body, session) {
+function layout(c, title, body, session, headExtra = "") {
   securityHeaders(c);
   const user = session?.username;
   const csrf = session?.csrf || "";
@@ -194,6 +199,7 @@ function layout(c, title, body, session) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css">
+${headExtra ? raw(headExtra) : ""}
 <script src="/theme.js" defer></script>
 </head><body>
 <header class="site-header"><div class="header-inner">
@@ -531,7 +537,7 @@ app.get("/post/:id", async (c) => {
 <div class="post-meta"><span class="post-author">${escapeHtml(post.author)}</span>
 <time datetime="${post.created_at}">${post.created_at}</time>
 ${post.updated_at ? '<span class="edited-marker">(edited)</span>' : ""}</div>
-<div class="post-body">${escapeHtml(post.body)}</div>
+<div class="post-body${looksLikeHtml(post.body) ? " post-body--rich" : ""}">${raw(renderPostBody(post.body))}</div>
 ${isAuthor ? raw(`<div class="post-actions"><a href="/edit/${post.id}" class="btn btn-secondary">Edit</a>
 <form method="post" action="/delete/${post.id}" class="delete-form"><input type="hidden" name="csrf_token" value="${session.csrf}">
 <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button></form></div>`) : ""}
@@ -551,12 +557,31 @@ app.get("/new", async (c) => {
   const session = await getSession(c);
   if (!session.user_id) return c.redirect("/login?next=/new", 302);
   await saveSession(c, session);
+  const editorHead = `
+<link rel="stylesheet" href="/vendor/quill/quill.snow.css">
+<link rel="stylesheet" href="/quill-theme.css">`;
   return layout(c, "New Post", raw(`
-<div class="edit-form"><h1>New Post</h1>
+<div class="edit-form edit-form--composer">
+<h1>New Post</h1>
+<p class="composer-lead">Compose with rich formatting — headings, emphasis, lists, quotes, code, and links.</p>
 <form method="post" action="/new"><input type="hidden" name="csrf_token" value="${session.csrf}">
-<div class="form-group"><label for="title">Title</label><input type="text" id="title" name="title" required maxlength="200"></div>
-<div class="form-group"><label for="body">Body</label><textarea id="body" name="body" rows="12" required maxlength="20000"></textarea></div>
-<button type="submit" class="btn btn-primary">Publish</button></form></div>`), session);
+<div class="form-group"><label for="title">Title</label><input type="text" id="title" name="title" required maxlength="200" placeholder="Give your post a title"></div>
+<div class="form-group">
+<label for="quill-editor">Body</label>
+<div class="quill-editor-wrap">
+<div id="quill-editor" class="quill-editor" aria-labelledby="quill-editor-label"></div>
+<textarea id="body" name="body" hidden required maxlength="20000"></textarea>
+</div>
+<div class="editor-meta">
+<span id="body-counter" class="char-counter">0 / 20,000</span>
+<span class="editor-hint">Toolbar shortcuts: Ctrl+B, Ctrl+I, Ctrl+U</span>
+</div>
+<p id="body-error" class="form-error" hidden></p>
+</div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">Publish</button></div>
+</form></div>
+<script src="/vendor/quill/quill.js"></script>
+<script src="/editor.js" defer></script>`), session, editorHead);
 });
 
 app.post("/new", async (c) => {
@@ -564,8 +589,10 @@ app.post("/new", async (c) => {
   if (!session.user_id) return c.redirect("/login?next=/new", 302);
   const fd = c.get("parsedBody") || await c.req.parseBody();
   const title = String(fd.title || "").trim();
-  const body = String(fd.body || "").trim();
-  if (!title || !body) return c.text("Validation error", 400);
+  const rawBody = String(fd.body || "").trim();
+  const body = sanitizeHtml(rawBody);
+  if (!title || isBodyEmpty(body)) return c.text("Validation error", 400);
+  if (stripHtml(body).length > 20000) return c.text("Validation error", 400);
   const r = await c.env.DB.prepare("INSERT INTO posts (author_id, title, body) VALUES (?, ?, ?)")
     .bind(session.user_id, title, body).run();
   return c.redirect(`/post/${r.meta.last_row_id}`, 302);

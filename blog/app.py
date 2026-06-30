@@ -36,7 +36,7 @@ def create_app(test_config=None):
     @app.after_request
     def security_headers(response):
         response.headers["Content-Security-Policy"] = (
-            "default-src 'self'; style-src 'self' https://fonts.googleapis.com; "
+            "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com"
         )
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -80,5 +80,6 @@ def create_app(test_config=None):
 
 if __name__ == "__main__":
     app = create_app()
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
     port = int(os.environ.get("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
